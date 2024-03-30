@@ -1,0 +1,55 @@
+\documentclass{article}
+\usepackage{listings}
+
+\begin{document}
+
+\title{Pseudocodigo problema 75}
+\author{Equipo 11}
+\date{\today}
+
+\maketitle
+
+\section{Introducción}
+En este articulo mostraremos el pseudocodigo de como resolver el problema de validacion de fecha.
+
+
+\section{Código de programación}
+
+
+\begin{lstlisting}[language=Python]
+def hello_world():
+	print("Hola, mundo!")
+
+def verificar_fecha(d, m, a):
+	if m < 1 or m > 12:
+		return False
+	if d < 1 or d > 31:
+		return False
+	if m == 2:
+		if a % 4 == 0 and (a % 100 != 0 or a % 400 == 0):
+			if d > 29:
+				return False
+		elif d > 28:
+			return False
+	elif m in [4, 6, 9, 11]:
+		if d > 30:
+			return False
+	return True
+
+d = 31
+m = 12
+a = 2022
+
+if verificar_fecha(d, m, a):
+	print("La fecha es valida")
+else:
+	print("La fecha no es valida")
+
+hello_world()
+\end{lstlisting}
+
+\section{Conclusiones}
+
+Un ejemplo de pseudocódigo en Python de como validar una fecha. Trataremos de hacer algo similar en una maquina de estados algoritmica en logisim.
+
+\end{document}
