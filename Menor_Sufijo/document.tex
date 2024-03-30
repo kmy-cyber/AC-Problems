@@ -1,0 +1,196 @@
+\documentclass{article}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{graphicx}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+	backgroundcolor=\color{backcolour},
+	commentstyle=\color{codegreen},
+	keywordstyle=\color{magenta},
+	numberstyle=\tiny\color{codegray},
+	stringstyle=\color{codepurple},
+	basicstyle=\footnotesize,
+	breakatwhitespace=false,
+	breaklines=true,
+	captionpos=b,
+	keepspaces=true,
+	numbers=left,
+	numbersep=5pt,
+	showspaces=false,
+	showstringspaces=false,
+	showtabs=false,
+	tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\title{Menor sufijo a agregar para convertir en Palindromo (Problema 64)}
+
+
+
+\begin{document}
+	
+	\maketitle
+	
+	\section{Descripcion del Ejercicio}
+	
+
+Un palíndromo es una palabra, frase, número o secuencia que se lee igual hacia adelante que hacia atrás, sin importar la dirección en la que se lea. Los palíndromos pueden ser de una sola palabra, como "11011" o "12321".
+
+Dado un patrón en forma de bits. Devolver el menor sufijo que habría que agregarle a dicho patrón para que fuera palíndromo.
+
+\textbf{Salida}
+
+Para la salida debe imprimir el menor sufijo, separando cada dígito por un espacio.
+
+Por ejemplo, para $L = [1, 0, 1, 1]$ debería imprimir:
+
+> 0 1
+
+\textbf{Logisim}
+
+Se dispondrá en \textit{INPUT} los datos de entrada a partir de la dirección $0$. La entrada se estructura de la siguiente forma:
+
+- $w_0$: $n$ (tamaño de la lista $L$)
+- $w_{1:n}$ : $L$
+
+\textbf{SASM}
+
+En la sección \texttt{.data} se deben definir los valores de entrada de la siguiente forma:
+
+- \texttt{n} : un número de tamaño \texttt{dd} que representa al tamaño de la lista $L$
+- \texttt{array} : un array de números de tamaño \texttt{dd} que representa $L$
+
+Por ejemplo, un posible encabezado podría ser:
+
+\begin{verbatim}
+	section .data
+	n dd 4
+	array dd 1, 0, 1, 1
+\end{verbatim}
+	
+	\section{Pseudocódigo}
+	
+	\begin{lstlisting}[language=Python, caption=Función  en Python]
+	# Funcion para saber si es palindromo
+	def esPalindromo(arr, inicio, n):
+		fin = n - 1
+		while inicio < fin:
+			if arr[inicio] != arr[fin]:
+				return False
+			inicio = inicio + 1
+			fin = fin - 1
+	return True
+	
+	# Funcion para imprimir el sufijo minimo que necesita ser agregado al inicio 
+	# para hacer el arreglo un palindromo.
+	def imprimirSufijoParaPalindromo(arr, n):
+	
+	# Encuentra la posicion inicial desde donde el sufijo debe
+	# ser un palindromo
+		while i < n:
+			if esPalindromo(arr, i, n):
+				break
+			i = i+1
+	
+	# Imprimir el sufijo necesario en orden inverso, que debe ser agregado al inicio
+	i = i-1
+	while i>=0:
+		print(arr[i], end =" ")
+	
+	arr = [1, 0, 1, 1]
+	n = len(arr)
+	
+	print("El sufijo necesario para convertir el arreglo en un palindromo es:", end=" ")
+	imprimirSufijoParaPalindromo(arr, n)
+	print()
+		
+	\end{lstlisting}
+	
+	\section{Código en Ensamblador}
+	
+	\begin{lstlisting}[language={[x86masm]Assembler}, caption=Código Tribonacci en Ensamblador]
+	%include "io.inc"
+	
+	section .data
+	arr dd 1, 0, 1, 1, 0, 0    ; Definir el arreglo.
+	n dd 6                  ; Longitud del arreglo.
+	
+	section .bss
+	; Reserva de espacio para variables si es necesario.
+	
+	section .text
+	global CMAIN
+	
+	CMAIN:
+	mov ebp, esp; for correct debugging
+	mov edi, arr        ; Primer argumento de 'imprimirSufijoParaPalindromo', la direccion de arr.
+	mov esi, [n]        ; Segundo argumento de 'imprimirSufijoParaPalindromo', el tamaño de arr.
+	call _imprimirSufijoParaPalindromo
+	
+	xor eax, eax
+	ret
+	
+	_esPalindromo:
+	mov ecx, esi                  ; copiamos n a ecx.
+	dec ecx                       ; fin = n - 1.
+	mov ebx, eax                  ; copiamos inicio a ebx (inicio de comparación).
+	
+	palindromo_loop:
+	cmp ebx, ecx                  ; Comparamos inicio con fin.
+	jge .esPalindromoRetornoVerdadero ; Si inicio >= fin, es palindromo.
+	mov eax, [edi + ebx*4]        ; Valor en inicio.
+	cmp eax, [edi + ecx*4]        ; Valor en fin.
+	jne .esPalindromoRetornoFalso
+	inc ebx                       ; Incrementamos inicio.
+	dec ecx                       ; Decrementamos fin.
+	jmp palindromo_loop
+	.esPalindromoRetornoFalso:
+	mov eax, 0                     ; Retornar falso (0).
+	ret
+	.esPalindromoRetornoVerdadero:
+	mov eax, 1                     ; Retornar verdadero (1).
+	ret
+	
+	_imprimirSufijoParaPalindromo:
+	xor ecx, ecx                   ; i = 0.
+	
+	find_palindromo_prefix_loop:
+	cmp ecx, esi                   ; Comparamos i con n.
+	je .find_palindromo_prefix_done ; si i == n hemos terminado.
+	mov edx, esi                   ; Argumento n para esPalindromo.
+	mov eax, ecx                   ; Argumento inicio para esPalindromo.
+	push ecx
+	call _esPalindromo
+	pop ecx
+	test eax, eax                  ; Verificamos si esPalindromo retorno verdadero.
+	jz .increment_i                ; Si no, incrementamos i y continuamos.
+	jmp .find_palindromo_prefix_done ; Si hemos terminado.
+	
+	.increment_i:
+	inc ecx
+	jmp find_palindromo_prefix_loop
+	
+	.find_palindromo_prefix_done:
+	dec ecx ; Ajustamos para el indice correcto del ultimo elemento no palindromo.
+	print_prefix:
+	cmp ecx, -1 ; Verificamos si hemos terminado con todos los elementos.
+	jle .done_printing
+	
+	PRINT_DEC 4, [arr + ecx*4]
+	
+	dec ecx ; Mover al siguiente elemento para imprimir.
+	jmp print_prefix
+	
+	.done_printing:
+	ret
+	\end{lstlisting}
+	
+	
+	
+\end{document}
