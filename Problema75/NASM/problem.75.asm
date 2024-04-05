@@ -16,24 +16,23 @@ main:
     mov dx, 0
     mov bx, 4
     div bx      ; Dividir el año por 4
-    cmp dx, 0   ; Verificar si el residuo es cero
+    cmp dx, 0   ; Verificar si el resto es cero
     jnz not_leap_year   ; Si no es cero, no es un año bisiesto
 
     mov dx, 0
     mov bx, 100
     div bx      ; Dividir el año por 100
-    cmp dx, 0   ; Verificar si el residuo es cero
+    cmp dx, 0   ; Verificar si el resto es cero
     jnz leap_year   ; Si no es cero, es un año bisiesto
 
     mov dx, 0
     mov bx, 400
     div bx      ; Dividir el año por 400
-    cmp dx, 0   ; Verificar si el residuo es cero
+    cmp dx, 0   ; Verificar si el resto es cero
     jz leap_year   ; Si es cero, es un año bisiesto
 
 not_leap_year:
-    ; Si no es un año bisiesto, maneja la lógica correspondiente aquí
-    ; Por ejemplo, si febrero tiene 28 días en lugar de 29 en años no bisiestos
+    ; No es bisiesto
     cmp byte [b], 2   ; Febrero
     je check_feb_non_leap_year
     jmp check_month_day
@@ -41,12 +40,12 @@ not_leap_year:
 check_feb_non_leap_year:
     cmp byte [a], 0   ; Día
     jz print_false
-    cmp byte [a], 28  ; Máximo día para febrero en año no bisiesto
+    cmp byte [a], 28  ; Cheaquea febrero aqui cuando no es bisiesto
     ja print_false
     jmp print_true
 
 leap_year:
-    ; Si es bisiesto, verifica si el día y el mes son válidos
+    ; Si es bisiesto verifica si el día y el mes son válidos
     cmp byte [b], 2   ; Febrero
     je check_leap_year_day
     jmp check_month_day
@@ -54,15 +53,16 @@ leap_year:
 check_leap_year_day:
     cmp byte [a], 0   ; Día
     jz print_false
-    cmp byte [a], 29  ; Máximo día para febrero en año bisiesto
+    cmp byte [a], 29  ; mira febrero en anno bisiesto
     ja print_false
 
-    ; Si es un año bisiesto y febrero, es una fecha válida
+    ; Si es un año bisiesto y febrero, es una fecha válida y returna 
     jmp print_true
 
 check_month_day:
+    ; chequea mes valido 
     cmp byte [b], 1   ; Enero
-    je check_january
+    je check_month_31_days
     cmp byte [b], 3   ; Marzo
     je check_march
     cmp byte [b], 5   ; Mayo
@@ -86,34 +86,22 @@ check_month_day:
     cmp byte [b], 12  ; Diciembre
     je check_month_31_days
 
-    ; Si el mes no es válido, es una fecha inválida
+    ; Si el mes no es válido, es una fecha inválida (no camina jajaja)
     jmp print_false
 
-check_january:
-    cmp byte [a], 0   ; Día
-    jz print_false
-    cmp byte [a], 31  ; Máximo día para enero
-    ja print_false
-    jmp print_true
 
-check_march:
-    cmp byte [a], 0   ; Día
-    jz print_false
-    cmp byte [a], 31  ; Máximo día para marzo
-    ja print_false
-    jmp print_true
 
 check_month_31_days:
     cmp byte [a], 0   ; Día
     jz print_false
-    cmp byte [a], 31  ; Máximo día para meses con 31 días
+    cmp byte [a], 31  ; Máx 31
     ja print_false
     jmp print_true
 
 check_month_30_days:
     cmp byte [a], 0   ; Día
     jz print_false
-    cmp byte [a], 30  ; Máximo día para meses con 30 días
+    cmp byte [a], 30  ; Máx 30
     ja print_false
     jmp print_true
 
@@ -131,5 +119,5 @@ print_false:
     add esp, 4
 
 exit_program:
-    ; Salir del programa
+    ; Finito
     ret
